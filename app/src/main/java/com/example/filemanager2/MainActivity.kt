@@ -1,37 +1,43 @@
 package com.example.filemanager2
 
-import android.content.DialogInterface
-import android.content.res.Configuration
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
-import androidx.activity.viewModels
+import android.widget.SearchView
+import android.widget.Toolbar
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.activityViewModels
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var drawerLayout: DrawerLayout
-    private val homeFragment: HomeFragment = HomeFragment()
+    private val allFragment: AllFragment = AllFragment()
     private val aboutUsActivity: AboutUsActivity = AboutUsActivity()
-    var activeFragmentTag: String? = null
+    private lateinit var toolbar: MaterialToolbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        drawerLayout = findViewById(R.id.drawerLayout)
-        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.start, R.string.end)
+        drawerLayout = findViewById(R.id.drawerLayoutMain)
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        toggle =
+            ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.start, R.string.end)
 
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val navigationView = findViewById<NavigationView>(R.id.navigation_view)
+        val navigationView = findViewById<NavigationView>(R.id.navigation_view_main)
         navigationView.setNavigationItemSelectedListener(this)
 
         if (savedInstanceState != null) {
@@ -45,11 +51,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         } else {
             supportFragmentManager.beginTransaction().apply {
-                replace(R.id.drawerSwitch, homeFragment)
+                replace(R.id.drawerSwitch, allFragment)
                 commit()
             }
         }
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (supportFragmentManager.findFragmentById(R.id.drawerSwitch)!! is AllFragment || supportFragmentManager.findFragmentById(
+                R.id.drawerSwitch
+            )!! is DetailsFragment
+        ) {
+            supportActionBar?.apply {
+                setDisplayHomeAsUpEnabled(false)
+            }
+        } else {
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -60,9 +80,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        Log.i("query_check", "came on nav")
         when (item.itemId) {
             R.id.home ->
-                supportFragmentManager.beginTransaction().replace(R.id.drawerSwitch, homeFragment)
+                supportFragmentManager.beginTransaction().replace(R.id.drawerSwitch, allFragment)
                     .commit()
             R.id.about_us ->
                 supportFragmentManager.beginTransaction()
@@ -82,53 +103,4 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             )
         }
     }
-
-//    override fun onBackPressed() {
-//        // Build the confirmation dialog
-//
-//        if (supportFragmentManager.backStackEntryCount == 0) {
-//            val builder = AlertDialog.Builder(this)
-//            builder.setTitle("Exit App")
-//            builder.setMessage("Are you sure you want to exit?")
-//
-//            // Set positive button click listener
-//            builder.setPositiveButton("Yes") { dialogInterface: DialogInterface, _: Int ->
-//                // Finish the activity and exit the app
-//                finish()
-//            }
-//
-//            // Set negative button click listener
-//            builder.setNegativeButton("No") { dialogInterface: DialogInterface, _: Int ->
-//                // Dismiss the dialog and continue with the back operation
-//                dialogInterface.dismiss()
-//            }
-//
-//            // Show the confirmation dialog
-//            val dialog = builder.create()
-//            dialog.show()
-//        }
-//    }
-
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        Log.i("back", "called on back pressed")
-//
-////        if (activeFragmentTag == "DocxFragment") {
-////            Log.e("back","called docx")
-////            val docxFragmentViewModel: DocxFragmentViewModel by viewModels()
-////            docxFragmentViewModel.file = null
-////        } else if (activeFragmentTag == "DocFragment") {
-////            Log.e("back","called doc")
-////            val docFragmentViewModel: DocFragmentViewModel by viewModels()
-////            docFragmentViewModel.file = null
-////        } else if (activeFragmentTag == "TextFragment") {
-////            Log.e("back","called text")
-////            val textFragmentViewModel: TextFragmentViewModel by viewModels()
-////            textFragmentViewModel.file = null
-////        } else if (activeFragmentTag == "AllFragment") {
-////            Log.e("back","called all")
-////            val allFragmentViewModel: AllFragmentViewModel by viewModels()
-////            allFragmentViewModel.file = null
-////        }
-//    }
 }

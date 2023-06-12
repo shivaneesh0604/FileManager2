@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="HelperTextAppearance" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textSize">25sp</item> <!-- Increase the text size as per your requirement -->
+    </style>
+
+</resources>

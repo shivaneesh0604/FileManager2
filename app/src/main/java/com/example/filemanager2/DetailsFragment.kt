@@ -14,112 +14,23 @@ import androidx.fragment.app.activityViewModels
 
 class DetailsFragment : Fragment() {
 
-    internal lateinit var sourceFragment: String
+//    internal lateinit var sourceFragment: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.i("detailsFrag","onView created in details frag")
+        Log.i("detailsFrag", "onView created in details frag")
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.i("detailsFrag","oncreateView in DetailsFrag")
+        Log.i("detailsFrag", "oncreateView in DetailsFrag")
         super.onCreate(savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             Log.e("detailsFrag", "back press success in details frag")
-
-            val fragmentManager = requireActivity().supportFragmentManager
-            val backstackCount = fragmentManager.backStackEntryCount
-
-            for (i in 0 until backstackCount) {
-                val backStackEntry = fragmentManager.getBackStackEntryAt(i)
-                val fragmentTag = backStackEntry.name
-
-//                Log.i("detailsFrag","fragment tag is "+fragmentTag)
-//                Log.i("detailsFrag","sourcefrag is "+sourceFragment)
-
-                if (fragmentTag == sourceFragment) {
-                    if (fragmentTag == "AllFragment") {
-                        Log.e("detailsFrag", "All ")
-                        val allFragmentViewModel: AllFragmentViewModel by activityViewModels()
-                        allFragmentViewModel.file = null
-                        fragmentManager.popBackStack(
-                            fragmentTag,
-                            FragmentManager.POP_BACK_STACK_INCLUSIVE
-                        )
-                        break
-                    } else if (fragmentTag == "DocxFragment") {
-                        Log.e("detailsFrag", "Docx ")
-                        val docxFragmentViewModel: DocxFragmentViewModel by activityViewModels()
-                        docxFragmentViewModel.file = null
-                        fragmentManager.popBackStack(
-                            fragmentTag,
-                            FragmentManager.POP_BACK_STACK_INCLUSIVE
-                        )
-                        break
-                    } else if (fragmentTag == "DocFragment") {
-                        Log.e("detailsFrag", "Doc ")
-                        val docFragmentViewModel: DocFragmentViewModel by activityViewModels()
-                        docFragmentViewModel.file = null
-                        fragmentManager.popBackStack(
-                            fragmentTag,
-                            FragmentManager.POP_BACK_STACK_INCLUSIVE
-                        )
-                        break
-                    } else if (fragmentTag == "TextFragment") {
-                        Log.e("detailsFrag", "Text ")
-                        val textFragmentViewModel: TextFragmentViewModel by activityViewModels()
-                        textFragmentViewModel.file = null
-                        fragmentManager.popBackStack(
-                            fragmentTag,
-                            FragmentManager.POP_BACK_STACK_INCLUSIVE
-                        )
-                        break
-                    }
-
-                }
-            }
-//                val fragmentManager = requireActivity().supportFragmentManager
-//                val fragmentFound = fragmentManager.findFragmentByTag("AllFragment") as AllFragment
-//                if (fragmentFound != null) {
-//
-//                    fragmentFound.allFragmentViewModel.file = null
-//                }
-
-//            if (sourceFragment == "AllFragment") {
-//                Log.e("detailsFrag", "All ")
-//                val allFragmentViewModel: AllFragmentViewModel by activityViewModels()
-//                allFragmentViewModel.file = null
-//                requireActivity().supportFragmentManager.popBackStack()
-//            } else if (sourceFragment == "DocxFragment") {
-//                Log.e("detailsFrag", "Docx")
-//                val docxFragmentViewModel: DocxFragmentViewModel by activityViewModels()
-//                docxFragmentViewModel.file = null
-//                requireActivity().supportFragmentManager.popBackStack()
-//            } else if (sourceFragment == "DocFragment") {
-//                Log.e("detailsFrag", "Doc")
-//                val docFragmentViewModel: DocFragmentViewModel by activityViewModels()
-//                docFragmentViewModel.file = null
-//                requireActivity().supportFragmentManager.popBackStack()
-//            } else if (sourceFragment == "TextFragment") {
-//                Log.e("detailsFrag", "Text")
-//                val textFragmentViewModel: TextFragmentViewModel by activityViewModels()
-//                textFragmentViewModel.file = null
-//                requireActivity().supportFragmentManager.popBackStack()
-//            }
-
-
-//            val fragmentToRemove = requireActivity().supportFragmentManager.findFragmentByTag(sourceFragment)
-//            if (fragmentToRemove!=null){
-//                fragmentManager?.popBackStack(sourceFragment, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-//            }
-
+            val allFragmentViewModel: AllFragmentViewModel by activityViewModels()
+            allFragmentViewModel.file = null
+            requireActivity().supportFragmentManager.popBackStack()
         }
-        //todo: to fetch from which frag i came here
-        //todo: to fetch from which frag i came here
-        //todo: to fetch from which frag i came here
-        //todo: to fetch from which frag i came here
-        //todo: to fetch from which frag i came here
-        //todo: to fetch from which frag i came here
     }
 
     override fun onCreateView(
@@ -127,7 +38,6 @@ class DetailsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-//        Log.e("detailsFrag","source fragment is "+sourceFragment)
         val view = inflater.inflate(R.layout.details_fragment, container, false)
 
         val result = arguments

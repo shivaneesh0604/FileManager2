@@ -5,27 +5,32 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.SearchView
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class AllFragment : Fragment(), RecyclerFileAdapter.FileClickListener {
+
+class AllFragment : Fragment(), RecyclerFileAdapter.FileClickListener, AddFileListener {
 
     private lateinit var recyclerView: RecyclerView
+    private var currentData: MutableList<File> = mutableListOf()
     internal val allFragmentViewModel: AllFragmentViewModel by activityViewModels()
+    internal val newFileCreationViewModel: NewFIleCreationViewModel by activityViewModels()
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var mMenuProvider: MenuProvider
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.e("back", "onviewCreated in allfrag")
-        (activity as MainActivity).activeFragmentTag = "AllFragment"
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        newFileCreationViewModel.addListener(this)
     }
 
     override fun onCreateView(
@@ -33,21 +38,16 @@ class AllFragment : Fragment(), RecyclerFileAdapter.FileClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.i("detailsFrag","oncreateView in AllFrag")
+        Log.i("detailsFrag", "oncreateView in AllFrag")
         val view = inflater.inflate(R.layout.fragment_all, container, false)
         val newFileButton: FloatingActionButton = view.findViewById(R.id.add_file)
-//        requireActivity().supportFragmentManager.beginTransaction()
-//            .replace(
-//                R.id.allRecyclerViewContainer, AllFragmentRecyclerViewContainer()
-//            )
-//            .addToBackStack(null).commit()
-
         recyclerView = view.findViewById(R.id.allRecyclerviewFile)
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         val itemsAdapter = RecyclerFileAdapter(requireContext(), AllData.getAllFiles(), this)
         recyclerView.adapter = itemsAdapter
+        currentData = AllData.getAllFiles()
 
         activityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -72,11 +72,9 @@ class AllFragment : Fragment(), RecyclerFileAdapter.FileClickListener {
             }
 
         if (allFragmentViewModel.file != null) {
-            Log.i("detailsFrag","saved in allFragment View mode")
+            Log.i("detailsFrag", "saved in allFragment View mode")
             val detailsFragment = DetailsFragment()
-            detailsFragment.sourceFragment = "AllFragment"
             val result = Bundle()
-//            result.putString("sourceFragment","AllFragment")
             result.putString("fileName", allFragmentViewModel.file!!.fileName)
             result.putString(
                 "lastModifiedTime",
@@ -90,22 +88,118 @@ class AllFragment : Fragment(), RecyclerFileAdapter.FileClickListener {
             if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 manager.replace(
                     R.id.allSelectedFileView,
-                    detailsFragment,"AllFragment"
+                    detailsFragment, "AllFragment"
                 )
             } else if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 manager.replace(
-                    R.id.drawerSwitch, detailsFragment,"AllFragment"
+                    R.id.drawerSwitch, detailsFragment, "AllFragment"
                 )
             }
             manager.addToBackStack("AllFragment").commit()
         }
+
         newFileButton.setOnClickListener {
-            val intent: Intent =
-                Intent(requireContext(), NewFileCreationActivity::class.java)
-            activityResultLauncher.launch(intent)
+            val newFileCreationFragment = NewFileCreationFragment()
+            newFileCreationFragment.show(
+                requireActivity().supportFragmentManager,
+                "NewFileCreationFragment"
+            )
         }
         return view
     }
+
+    override fun onStart() {
+        super.onStart()
+        Log.i("onStart", "called onstart")
+        mMenuProvider = object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                Log.i("onStart", "called onstart2 below onstart")
+                menuInflater.inflate(R.menu.top_app_bar, menu)
+                val searchFun = menu.findItem(R.id.search)
+                val searchView: SearchView = searchFun.actionView as SearchView
+                searchView.queryHint = "Search..."
+                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        return true
+                    }
+
+                    override fun onQueryTextChange(newText: String): Boolean {
+                        performSearch(newText)
+                        return true
+                    }
+                })
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.search -> return true
+                    R.id.filterDoc -> {
+                        performFilterOperation("Doc")
+                        return true
+                    }
+
+                    R.id.filterDocx -> {
+                        performFilterOperation("Docx")
+                        return true
+                    }
+
+                    R.id.filterText -> {
+                        performFilterOperation("Text")
+                        return true
+                    }
+
+                    R.id.filterAll -> {
+                        performFilterOperation("All")
+                        return true
+                    }
+
+
+                }
+                return false
+            }
+        }
+        (requireActivity() as MenuHost).addMenuProvider(mMenuProvider)
+    }
+
+    private fun performFilterOperation(filter: String) {
+
+        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        val isDarkMode = currentNightMode == Configuration.UI_MODE_NIGHT_YES
+
+        if (isDarkMode) {
+
+        }
+        when (filter) {
+            "Doc" -> {
+                recyclerView.adapter =
+                    RecyclerFileAdapter(requireContext(), AllData.getAllDocFiles(), this)
+                currentData = AllData.getAllDocFiles()
+            }
+            "Docx" -> {
+                recyclerView.adapter =
+                    RecyclerFileAdapter(requireContext(), AllData.getAllDocxFiles(), this)
+                currentData = AllData.getAllDocxFiles()
+            }
+            "Text" -> {
+                recyclerView.adapter =
+                    RecyclerFileAdapter(requireContext(), AllData.getAllTextFiles(), this)
+                currentData = AllData.getAllTextFiles()
+            }
+            "All" -> {
+                recyclerView.adapter =
+                    RecyclerFileAdapter(requireContext(), AllData.getAllFiles(), this)
+                currentData = AllData.getAllFiles()
+            }
+
+        }
+//        Toast.makeText(requireContext(), "Selected filter: $filter", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (requireActivity() as MenuHost).removeMenuProvider(mMenuProvider)
+    }
+
 
     override fun clickedFile(file: File) {
         Log.i("selected", "clicked")
@@ -123,13 +217,13 @@ class AllFragment : Fragment(), RecyclerFileAdapter.FileClickListener {
             "check in recyclerViewContainerFragment whether fileis saved " + allFragmentViewModel.file
         )
         val detailsFragment = DetailsFragment()
-        detailsFragment.sourceFragment = "AllFragment"
+//        detailsFragment.sourceFragment = "AllFragment"
         detailsFragment.arguments = result
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             Log.i("tag11", "Portrait")
             val manager = requireActivity().supportFragmentManager
             manager.beginTransaction()
-                .replace(R.id.drawerSwitch, detailsFragment,"AllFragment")
+                .replace(R.id.drawerSwitch, detailsFragment, "AllFragment")
                 .addToBackStack("AllFragment")
                 .commit()
         } else {
@@ -137,12 +231,36 @@ class AllFragment : Fragment(), RecyclerFileAdapter.FileClickListener {
             val manager = requireActivity().supportFragmentManager
             manager.beginTransaction().replace(
                 R.id.allSelectedFileView,
-                detailsFragment,"AllFragment"
+                detailsFragment, "AllFragment"
             )
                 .addToBackStack("AllFragment")
                 .commit()
         }
     }
 
+    fun performSearch(query: String) {
+        val filteredList = mutableListOf<File>()
+
+        for (item in currentData) {
+            if (item.fileName?.toLowerCase()!!.contains(query.toLowerCase())) {
+                filteredList.add(item)
+            }
+        }
+
+        if (filteredList.isEmpty()) {
+            Toast.makeText(requireContext(), "No Data Found", Toast.LENGTH_SHORT).show()
+        } else {
+            recyclerView.adapter = RecyclerFileAdapter(requireContext(), filteredList, this)
+        }
+    }
+
+    override fun addFile(file: File) {
+        Log.e("fileCheck", "fileCheck")
+        AllData.addFile(file)
+
+        Log.e("fileCheck", "FIles size " + AllData.getAllFiles().size)
+
+        recyclerView.adapter = RecyclerFileAdapter(requireContext(), AllData.getAllFiles(), this)
+    }
 
 }
