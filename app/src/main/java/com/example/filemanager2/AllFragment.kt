@@ -22,9 +22,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class AllFragment : Fragment(), RecyclerFileAdapter.FileClickListener, AddFileListener {
 
     private lateinit var recyclerView: RecyclerView
-    private var currentData: MutableList<File> = mutableListOf()
-    internal val allFragmentViewModel: AllFragmentViewModel by activityViewModels()
-    internal val newFileCreationViewModel: NewFIleCreationViewModel by activityViewModels()
+    private var currentData: List<File> = mutableListOf()
+    private val allFragmentViewModel: AllFragmentViewModel by activityViewModels()
+    private val newFileCreationViewModel: NewFIleCreationViewModel by activityViewModels()
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var mMenuProvider: MenuProvider
 
@@ -59,12 +59,16 @@ class AllFragment : Fragment(), RecyclerFileAdapter.FileClickListener, AddFileLi
                     val fileSize = data.getStringExtra("fileSize")
                     val filePath = data.getStringExtra("filePath")
                     lateinit var fileType: FileType
-                    if (fileTypeReceived == "txt") {
-                        fileType = FileType.txt
-                    } else if (fileTypeReceived == "doc") {
-                        fileType = FileType.doc
-                    } else if (fileTypeReceived == "docx") {
-                        fileType = FileType.docx
+                    when (fileTypeReceived) {
+                        "txt" -> {
+                            fileType = FileType.Txt
+                        }
+                        "doc" -> {
+                            fileType = FileType.Doc
+                        }
+                        "docx" -> {
+                            fileType = FileType.Docx
+                        }
                     }
                     val file = File(fileName, fileType, lastModifiedTime, fileSize, filePath)
                     AllData.addFile(file)
@@ -167,7 +171,7 @@ class AllFragment : Fragment(), RecyclerFileAdapter.FileClickListener, AddFileLi
         val isDarkMode = currentNightMode == Configuration.UI_MODE_NIGHT_YES
 
         if (isDarkMode) {
-
+            //todo:Dark Mode Funtions
         }
         when (filter) {
             "Doc" -> {

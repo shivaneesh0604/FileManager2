@@ -133,7 +133,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:text="Last Modified Time"
-                android:textSize="18dp"
+                android:textSize="@dimen/texti"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -246,4 +246,5 @@
             app:layout_constraintTop_toBottomOf="@+id/formLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </ScrollView>

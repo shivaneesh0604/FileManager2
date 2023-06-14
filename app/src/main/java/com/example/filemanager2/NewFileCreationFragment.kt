@@ -12,7 +12,6 @@ import android.widget.*
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputLayout
-import org.w3c.dom.Text
 import java.util.*
 
 
@@ -66,25 +65,22 @@ class NewFileCreationFragment : BottomSheetDialogFragment() {
 
         val lastModifiedTime = view.findViewById<Button>(R.id.lastModifiedTime)
 
-        lastModifiedTime.setOnClickListener(
-            View.OnClickListener {
-                Log.d("OnClickLastModifiedTime", "OnClickLastModifiedTime")
-                timePickerDialog = TimePickerDialog(
-                    requireContext(),
-                    TimePickerDialog.OnTimeSetListener { timePicker, hourOfDay, minute ->
-                        Log.d("OnClickLastModifiedTime", "OnClickLastModifiedTime")
+        lastModifiedTime.setOnClickListener {
+            Log.d("OnClickLastModifiedTime", "OnClickLastModifiedTime")
+            timePickerDialog = TimePickerDialog(
+                requireContext(),
+                { _, hourOfDay, minute ->
+                    Log.d("OnClickLastModifiedTime", "OnClickLastModifiedTime")
 
 //                        val editableTime = Editable.Factory.getInstance().newEditable(formattedTime)
-                        lastModifiedTime.text = "$hourOfDay : $minute"
-                        view.findViewById<TextView>(R.id.LastModifiedMandatoryField).text = ""
-                    },
-                    0, 0, false
-                )
-                timePickerDialog.setTitle("select time")
-                timePickerDialog.show()
-
-            }
-        )
+                    lastModifiedTime.text = "$hourOfDay : $minute"
+                    view.findViewById<TextView>(R.id.LastModifiedMandatoryField).text = ""
+                },
+                0, 0, false
+            )
+            timePickerDialog.setTitle("select time")
+            timePickerDialog.show()
+        }
 
 //        checkSubmit(view)
         val detailsSubmit: Button = view.findViewById(R.id.detailsSubmit)
@@ -105,12 +101,16 @@ class NewFileCreationFragment : BottomSheetDialogFragment() {
 
                 var selectedFileType:FileType?=null
 
-                if (selectedRadioButton.text == "DOC"){
-                    selectedFileType = FileType.doc
-                }else if (selectedRadioButton.text == "DOCX"){
-                    selectedFileType = FileType.docx
-                }else if (selectedRadioButton.text == "TXT"){
-                    selectedFileType = FileType.txt
+                when (selectedRadioButton.text) {
+                    "DOC" -> {
+                        selectedFileType = FileType.Doc
+                    }
+                    "DOCX" -> {
+                        selectedFileType = FileType.Docx
+                    }
+                    "TXT" -> {
+                        selectedFileType = FileType.Txt
+                    }
                 }
                 val file = File(
                     (fileNameText as TextView).text.toString(),
@@ -186,11 +186,11 @@ class NewFileCreationFragment : BottomSheetDialogFragment() {
     private fun checkLastModifiedTimeNull(view: View): String? {
         val lastModifiedTime = view.findViewById<Button>(R.id.lastModifiedTime).text.toString()
 
-        if (lastModifiedTime.isNotEmpty()) {
-            return null
+        return if (lastModifiedTime.isNotEmpty()) {
+            null
         } else {
             view.findViewById<TextView>(R.id.LastModifiedMandatoryField).text = "*"
-            return "Required"
+            "Required"
         }
     }
 
@@ -206,14 +206,14 @@ class NewFileCreationFragment : BottomSheetDialogFragment() {
 //
 //    }
 
-    fun checkFileNameNull(view: View): String? {
+    private fun checkFileNameNull(view: View): String? {
         val fileNameText = view.findViewById<EditText>(R.id.fileNameText).text.toString()
 
-        if (fileNameText.length > 0) {
-            return null
+        return if (fileNameText.isNotEmpty()) {
+            null
         } else {
             view.findViewById<TextInputLayout>(R.id.fileNameContainer).helperText = "*"
-            return "Required"
+            "Required"
         }
     }
 

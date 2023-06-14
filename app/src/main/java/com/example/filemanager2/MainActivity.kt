@@ -1,14 +1,9 @@
 package com.example.filemanager2
 
-import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
-import android.widget.SearchView
-import android.widget.Toolbar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -20,7 +15,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var drawerLayout: DrawerLayout
     private val allFragment: AllFragment = AllFragment()
-    private val aboutUsActivity: AboutUsActivity = AboutUsActivity()
+    private val aboutUsFragment: AboutUsFragment = AboutUsFragment()
     private lateinit var toolbar: MaterialToolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +82,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     .commit()
             R.id.about_us ->
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.drawerSwitch, aboutUsActivity)
+                    .replace(R.id.drawerSwitch, aboutUsFragment)
                     .commit()
         }
         drawerLayout.closeDrawer(GravityCompat.START)

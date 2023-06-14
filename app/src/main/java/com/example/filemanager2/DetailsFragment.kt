@@ -1,6 +1,5 @@
 package com.example.filemanager2
 
-import android.app.FragmentManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -56,12 +55,16 @@ class DetailsFragment : Fragment() {
         fileType.text =
             result?.getString("fileType")
 
-        if (fileType.text == "docx") {
-            image.setImageResource(R.drawable.docx_image)
-        } else if (fileType.text == "txt") {
-            image.setImageResource(R.drawable.text_image)
-        } else if (fileType.text == "doc") {
-            image.setImageResource(R.drawable.doc_image)
+        when (fileType.text) {
+            "docx" -> {
+                image.setImageResource(R.drawable.docx_image)
+            }
+            "txt" -> {
+                image.setImageResource(R.drawable.text_image)
+            }
+            "doc" -> {
+                image.setImageResource(R.drawable.doc_image)
+            }
         }
 
         Log.i("selected", "came here " + result?.getString("fileName"))
