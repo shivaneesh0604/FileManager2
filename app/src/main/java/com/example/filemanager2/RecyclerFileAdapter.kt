@@ -21,6 +21,7 @@ class RecyclerFileAdapter(private val context: Context, private val listItems: M
         return listItems.size
     }
 
+
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
         val item = listItems[position]
         holder.fileName.text = item.fileName
@@ -29,13 +30,16 @@ class RecyclerFileAdapter(private val context: Context, private val listItems: M
         holder.filePath.text = item.filePath
         holder.fileType.text = item.fileType.toString()
 
-        if (item.fileType == FileType.Docx){
-            holder.fileImage.setImageResource(R.drawable.docx_image)
-        }
-        else if (item.fileType == FileType.Doc){
-            holder.fileImage.setImageResource(R.drawable.doc_image)
-        }else if (item.fileType == FileType.Txt){
-            holder.fileImage.setImageResource(R.drawable.text_image)
+        when (item.fileType) {
+            FileType.Docx -> {
+                holder.fileImage.setImageResource(R.drawable.docx_image)
+            }
+            FileType.Doc -> {
+                holder.fileImage.setImageResource(R.drawable.doc_image)
+            }
+            FileType.Txt -> {
+                holder.fileImage.setImageResource(R.drawable.text_image)
+            }
         }
 
         holder.itemView.setOnClickListener{
